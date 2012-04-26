@@ -154,8 +154,8 @@
     </head>
     <body>
         <div id="container">
-            <h1>Bismark Status</h1>
-            <p>These graphs show availability of BISmark routers. Outages occur when:
+            <h1>BISmark Router Status</h1>
+            <p>This page shows availability of BISmark routers. Outages occur when:
 
             <ol>
                 <li><i>A router doesn't respond to BISmark management server pings
@@ -166,14 +166,22 @@
                 network also experiences outages.</li>
             </ol>
 
-            <p>On the graphs, thick black lines indicate time intervals when data is
-            available, red triangles indicate the start of an outage, and the dotted
-            blue line indicates the last time the graph was generated. The upper X
-            axis limit of the graph is the current time. Data availability is
-            generally about 10 minutes behind the generation time and should never
-            be more than 24 hours. The graph is generated every hour, so the dotted
-            blue line should never lag more than an hour behind the current
-            time.</p>
+            How to read the graph:
+
+            <ol>
+                <li>Thick black lines indicate time intervals when a router is
+                available.</li>
+                <li>Red triangles indicate the start of an outage.</li>
+                <li>The dotted blue line indicates the last time the graph was
+                generated.</li>
+                <li>The upper X axis limit of the graph is the current
+                time.</li>
+            </ol>
+
+            <p>Data availability is generally about 10 minutes behind the
+            generation time and should never be more than 24 hours. The graph is
+            generated every hour, so the dotted blue line should never lag more
+            than an hour behind the current time.</p>
 
             <div id="graph"></div>
     </div>
