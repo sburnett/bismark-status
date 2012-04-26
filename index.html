@@ -1,0 +1,184 @@
+<html>
+    <head>
+        <title>BISmark Status</title>
+        <link rel="stylesheet" type="text/css" href="style.css" media="all" />
+        <script src="jquery.min.js"></script>
+        <script src="highstock.js"></script>
+
+        <script type="text/javascript">
+        $.getJSON('status.json', function(data) {
+            var dictionary = data[0];
+            var currentTime = parseInt(data[1]);
+            var node_ids = [];
+            for (var node_id in dictionary) {
+                node_ids.push(node_id);
+            }
+            node_ids.sort();
+            node_ids.reverse();
+
+            var series = [];
+            var ticks = [0];
+            var labels = [];
+            var y = 1;
+            for (var i in node_ids) {
+                var node_id = node_ids[i];
+                var points = [];
+                var ends = [];
+                var availabilities = dictionary[node_id][0];
+                var outages = dictionary[node_id][1];
+                for (var idx in availabilities) {
+                    points.push([parseInt(availabilities[idx]), y]);
+                    points.push([parseInt(outages[idx]), y]);
+                    points.push([parseInt(outages[idx]), null]);
+                    ends.push([parseInt(outages[idx]), y]);
+                }
+                points.push([Date.now(), y]);
+                series.push({
+                    data: points,
+                    type: 'line'
+                });
+                series.push({
+                    data: ends,
+                    type: 'scatter'
+                });
+                ticks.push(y);
+                labels[y] = node_id;
+                ++y;
+            }
+            ticks.push(y);
+            new Highcharts.StockChart({
+                chart: {
+                    animation: false,
+                    height: 20 * (y - 1) + 150,
+                    renderTo: 'graph',
+                    zoomType: 'x'
+                },
+                navigator: {
+                    enabled: false
+                },
+                plotOptions: {
+                    line: {
+                        color: '#555',
+                        dataGrouping: {
+                            enabled: false
+                        },
+                        lineWidth: 2
+                    },
+                    scatter: {
+                        color: '#c00',
+                        marker: {
+                            enabled: true,
+                            symbol: "triangle-down"
+                        },
+                    },
+                    series: {
+                        animation: false,
+                        enableMouseTracking: false
+                    }
+                },
+                rangeSelector: {
+                    buttons: [{
+                        type: 'day',
+                        count: 1,
+                        text: '1d'
+                    }, {
+                        type: 'week',
+                        count: 1,
+                        text: '1w'
+                    }, {
+                        type: 'month',
+                        count: 1,
+                        text: '1m'
+                    }, {
+                        type: 'month',
+                        count: 3,
+                        text: '3m'
+                    }, {
+                        type: 'month',
+                        count: 6,
+                        text: '6m'
+                    }, {
+                        type: 'year',
+                        count: 1,
+                        text: '1y'
+                    }, {
+                        type: 'all',
+                        text: 'All'
+                    }],
+                    selected: 0
+                },
+                series: series,
+                subtitle: {
+                    text: 'Generated ' + (new Date(currentTime)).toUTCString()
+                },
+                title: {
+                    text: 'BISmark Router Availability'
+                },
+                tooltip: {
+                    enabled: true,
+                    shared: true
+                },
+                xAxis: {
+                    ordinal: false,
+                    plotLines: [{
+                        color: 'blue',
+                        dashStyle: 'ShortDot',
+                        value: currentTime,
+                        width: 2,
+                        zIndex: 3
+                    }]
+                },
+                yAxis: {
+                    labels: {
+                        align: "right",
+                        formatter: function() {
+                            return labels[this.value];
+                        },
+                        style: {
+                            color: 'black',
+                            fontFamily: 'monospace',
+                            fontSize: '12pt',
+                            fontWeight: 'bold'
+                        },
+                        x: -5,
+                        y: 3
+                    },
+                    tickPositions: ticks,
+                    title: {
+                        text: 'Bismark node ID'
+                    }
+                }
+            });
+        });
+        $.get('statistics.html', function(data) {
+            $("#statistics").html(data);
+        });
+        </script>
+    </head>
+    <body>
+        <div id="container">
+            <h1>Bismark Status</h1>
+            <p>These graphs show availability of BISmark routers. Outages occur when:
+
+            <ol>
+                <li><i>A router doesn't respond to BISmark management server pings
+                    for more than two minutes.</i> The BISmark management server
+                pings each router every minute.</li>
+                <li><i>The BISmark management server is down.</i> The management
+                server occasionally goes down for maintenance; the Georgia Tech
+                network also experiences outages.</li>
+            </ol>
+
+            <p>On the graphs, thick black lines indicate time intervals when data is
+            available, red triangles indicate the start of an outage, and the dotted
+            blue line indicates the last time the graph was generated. The upper X
+            axis limit of the graph is the current time. Data availability is
+            generally about 10 minutes behind the generation time and should never
+            be more than 24 hours. The graph is generated every hour, so the dotted
+            blue line should never lag more than an hour behind the current
+            time.</p>
+
+            <div id="graph"></div>
+    </div>
+    </body>
+</html>
