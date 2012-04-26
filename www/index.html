@@ -159,7 +159,7 @@
 
             <ol>
                 <li><i>A router doesn't respond to BISmark management server pings
-                    for more than two minutes.</i> The BISmark management server
+                    for more than four minutes.</i> The BISmark management server
                 pings each router every minute.</li>
                 <li><i>The BISmark management server is down.</i> The management
                 server occasionally goes down for maintenance; the Georgia Tech
@@ -174,14 +174,10 @@
                 <li>Red triangles indicate the start of an outage.</li>
                 <li>The dotted blue line indicates the last time the graph was
                 generated.</li>
-                <li>The upper X axis limit of the graph is the current
-                time.</li>
+                <li>The upper X axis limit of the graph is the current time. The
+                graph is generated every 10 minutes, so the dotted blue line
+                should never lag more than an hour behind the current time.</li>
             </ol>
-
-            <p>Data availability is generally about 10 minutes behind the
-            generation time and should never be more than 24 hours. The graph is
-            generated every hour, so the dotted blue line should never lag more
-            than an hour behind the current time.</p>
 
             <div id="graph"></div>
     </div>
