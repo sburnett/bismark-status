@@ -1,7 +1,8 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
     <head>
         <title>BISmark Status</title>
-        <link rel="stylesheet" type="text/css" href="style.css" media="all" />
+        <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
         <script src="jquery.min.js"></script>
         <script src="highstock.js"></script>
 
@@ -53,7 +54,9 @@
                     points.push([availabilityTimestamp, y]);
                     points.push([outageTimestamp, y]);
                     points.push([outageTimestamp, null]);
-                    ends.push([outageTimestamp, y]);
+                    if (currentTime - 300000 > outageTimestamp) {
+                        ends.push([outageTimestamp, y]);
+                    }
 
                     var roundedAvailabilityTimestamp = availabilityTimestamp - (availabilityTimestamp % 60000);
                     if (!(roundedAvailabilityTimestamp in cumulativeSteps)) {
@@ -64,7 +67,9 @@
                     if (!(roundedOutageTimestamp in cumulativeSteps)) {
                         cumulativeSteps[roundedOutageTimestamp] = 0;
                     }
-                    cumulativeSteps[roundedOutageTimestamp]--;
+                    if (currentTime - 300000 > outageTimestamp) {
+                        cumulativeSteps[roundedOutageTimestamp]--;
+                    }
                 }
                 points.push([Date.now(), y]);
                 series.push({
@@ -232,15 +237,24 @@
                     }],
                     selected: 0
                 },
+                plotOptions: {
+                    area: {
+                        dataGrouping: {
+                            enabled: true,
+                            approximation: "low",
+                        },
+                    },
+                },
                 series: [{
                     data: cumulativePoints,
-                    type: 'line',
+                    type: 'area',
+                    step: true,
                     name: 'Online'
                 }],
                 chart: {
                     animation: false,
                     renderTo: 'cumulative',
-                    zoomType: 'x'
+                    zoomType: 'x',
                 },
                 title: {
                     text: 'How many routers are online?',
@@ -250,20 +264,21 @@
                 },
                 yAxis: {
                     title: 'Routers online',
+                    min: 0
                 },
             });
         });
         </script>
     </head>
     <body>
-        <div id="container">
+        <div class="container">
             <h1>BISmark Router Status</h1>
             <p>This page shows availability of BISmark routers. Outages occur when:
 
             <ol>
-                <li><i>A router doesn't respond to BISmark management server pings
-                    for more than four minutes.</i> The BISmark management server
-                pings each router every minute.</li>
+                <li><i>A router doesn't contact the BISmark management server
+                    for more than five minutes.</i> Routers are supposed to
+                contact the management server every minute.</li>
                 <li><i>The BISmark management server is down.</i> The management
                 server occasionally goes down for maintenance; the Georgia Tech
                 network also experiences outages.</li>
@@ -282,14 +297,19 @@
                 should never lag more than an hour behind the current time.</li>
             </ol>
 
-            <form method="GET">
-                <b>Search for a node suffix:</b>
-                <input name="node" type="text"/>
-                <input type="submit" value="Apply filter" />
-            </form>
-
             <div id="cumulative"></div>
-            <div id="graph"></div>
-    </div>
+
+            <br/>
+
+            <form method="GET" class="form-search">
+                <input name="node" type="text" class="input-medium search-query" placeholder="Node ID suffix"/>
+                <button type="submit" value="Apply filter" class="btn">Apply filter</button>
+            </form>
+            <div id="graph">
+                <div class="progress progress-striped active" style="width: 100px">
+                    <div class="bar" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
     </body>
 </html>
