@@ -34,6 +34,8 @@
             node_ids.sort();
             node_ids.reverse();
 
+            var cumulativeSteps = {};
+
             var series = [];
             var ticks = [0];
             var labels = [];
@@ -45,10 +47,24 @@
                 var availabilities = dictionary[node_id][0];
                 var outages = dictionary[node_id][1];
                 for (var idx in availabilities) {
-                    points.push([parseInt(availabilities[idx]), y]);
-                    points.push([parseInt(outages[idx]), y]);
-                    points.push([parseInt(outages[idx]), null]);
-                    ends.push([parseInt(outages[idx]), y]);
+                    var availabilityTimestamp = parseInt(availabilities[idx]);
+                    var outageTimestamp = parseInt(outages[idx]);
+
+                    points.push([availabilityTimestamp, y]);
+                    points.push([outageTimestamp, y]);
+                    points.push([outageTimestamp, null]);
+                    ends.push([outageTimestamp, y]);
+
+                    var roundedAvailabilityTimestamp = availabilityTimestamp - (availabilityTimestamp % 60000);
+                    if (!(roundedAvailabilityTimestamp in cumulativeSteps)) {
+                        cumulativeSteps[roundedAvailabilityTimestamp] = 0;
+                    }
+                    cumulativeSteps[roundedAvailabilityTimestamp]++;
+                    var roundedOutageTimestamp = outageTimestamp - (outageTimestamp % 60000);
+                    if (!(roundedOutageTimestamp in cumulativeSteps)) {
+                        cumulativeSteps[roundedOutageTimestamp] = 0;
+                    }
+                    cumulativeSteps[roundedOutageTimestamp]--;
                 }
                 points.push([Date.now(), y]);
                 series.push({
@@ -167,6 +183,75 @@
                     }
                 }
             });
+
+            if (getParameterByName("node") != "") {
+                return;
+            }
+
+            var timestamps = [];
+            for (var timestamp in cumulativeSteps) {
+                timestamps.push(timestamp);
+            }
+            timestamps.sort();
+            var currentCount = 0;
+            var cumulativePoints = [];
+            for (i in timestamps) {
+                currentCount += cumulativeSteps[timestamps[i]];
+                cumulativePoints.push([parseInt(timestamps[i]), currentCount]);
+            }
+
+            new Highcharts.StockChart({
+                rangeSelector: {
+                    buttons: [{
+                        type: 'day',
+                        count: 1,
+                        text: '1d'
+                    }, {
+                        type: 'week',
+                        count: 1,
+                        text: '1w'
+                    }, {
+                        type: 'month',
+                        count: 1,
+                        text: '1m'
+                    }, {
+                        type: 'month',
+                        count: 3,
+                        text: '3m'
+                    }, {
+                        type: 'month',
+                        count: 6,
+                        text: '6m'
+                    }, {
+                        type: 'year',
+                        count: 1,
+                        text: '1y'
+                    }, {
+                        type: 'all',
+                        text: 'All'
+                    }],
+                    selected: 0
+                },
+                series: [{
+                    data: cumulativePoints,
+                    type: 'line',
+                    name: 'Online'
+                }],
+                chart: {
+                    animation: false,
+                    renderTo: 'cumulative',
+                    zoomType: 'x'
+                },
+                title: {
+                    text: 'How many routers are online?',
+                },
+                xAxis: {
+                    ordinal: false,
+                },
+                yAxis: {
+                    title: 'Routers online',
+                },
+            });
         });
         </script>
     </head>
@@ -203,6 +288,7 @@
                 <input type="submit" value="Apply filter" />
             </form>
 
+            <div id="cumulative"></div>
             <div id="graph"></div>
     </div>
     </body>
