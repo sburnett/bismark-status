@@ -6,11 +6,29 @@
         <script src="highstock.js"></script>
 
         <script type="text/javascript">
+
+        // Source: http://stackoverflow.com/a/2548133
+        String.prototype.endsWith = function(suffix) {
+            return this.indexOf(suffix, this.length - suffix.length) !== -1;
+        };
+
+        // Source: http://stackoverflow.com/a/901144
+        function getParameterByName(name) {
+            name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+            var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+                results = regex.exec(location.search);
+            return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+        }
+
         $.getJSON('status.json', function(data) {
             var dictionary = data[0];
             var currentTime = parseInt(data[1]);
             var node_ids = [];
+            var filter = getParameterByName("node");
             for (var node_id in dictionary) {
+                if (!node_id.endsWith(filter)) {
+                    continue;
+                }
                 node_ids.push(node_id);
             }
             node_ids.sort();
@@ -178,6 +196,12 @@
                 graph is generated every 10 minutes, so the dotted blue line
                 should never lag more than an hour behind the current time.</li>
             </ol>
+
+            <form method="GET">
+                <b>Search for a node suffix:</b>
+                <input name="node" type="text"/>
+                <input type="submit" value="Apply filter" />
+            </form>
 
             <div id="graph"></div>
     </div>
