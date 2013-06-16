@@ -74,21 +74,46 @@
                 points.push([Date.now(), y]);
                 series.push({
                     data: points,
-                    type: 'line'
+                    type: 'line',
+                    enableMouseTracking: false,
+                    animation: false,
+                    yAxis: 1,
                 });
                 series.push({
                     data: ends,
-                    type: 'scatter'
+                    type: 'scatter',
+                    enableMouseTracking: false,
+                    animation: false,
+                    yAxis: 1,
                 });
                 ticks.push(y);
                 labels[y] = node_id;
                 ++y;
             }
+            var timestamps = [];
+            for (var timestamp in cumulativeSteps) {
+                timestamps.push(timestamp);
+            }
+            timestamps.sort();
+            var currentCount = 0;
+            var cumulativePoints = [];
+            for (i in timestamps) {
+                currentCount += cumulativeSteps[timestamps[i]];
+                cumulativePoints.push([parseInt(timestamps[i]), currentCount]);
+            }
+            series.push({
+                data: cumulativePoints,
+                type: 'area',
+                step: true,
+                name: 'Online',
+                yAxis: 0,
+            });
+
             ticks.push(y);
             new Highcharts.StockChart({
                 chart: {
                     animation: false,
-                    height: 20 * (y - 1) + 150,
+                    height: 20 * (y - 1) + 400,
                     renderTo: 'graph',
                     zoomType: 'x'
                 },
@@ -110,10 +135,12 @@
                             symbol: "triangle-down"
                         },
                     },
-                    series: {
-                        animation: false,
-                        enableMouseTracking: false
-                    }
+                    area: {
+                        dataGrouping: {
+                            enabled: true,
+                            approximation: "low",
+                        },
+                    },
                 },
                 rangeSelector: {
                     buttons: [{
@@ -167,7 +194,14 @@
                         zIndex: 3
                     }]
                 },
-                yAxis: {
+                yAxis: [{
+                    ordinal: false,
+                    height: 240,
+                    title: {
+                        text: 'Routers online',
+                    },
+                    lineWidth: 2,
+                }, {
                     labels: {
                         align: "right",
                         formatter: function() {
@@ -185,87 +219,12 @@
                     tickPositions: ticks,
                     title: {
                         text: 'BISmark node ID'
-                    }
-                }
-            });
-
-            if (getParameterByName("node") != "") {
-                return;
-            }
-
-            var timestamps = [];
-            for (var timestamp in cumulativeSteps) {
-                timestamps.push(timestamp);
-            }
-            timestamps.sort();
-            var currentCount = 0;
-            var cumulativePoints = [];
-            for (i in timestamps) {
-                currentCount += cumulativeSteps[timestamps[i]];
-                cumulativePoints.push([parseInt(timestamps[i]), currentCount]);
-            }
-
-            new Highcharts.StockChart({
-                rangeSelector: {
-                    buttons: [{
-                        type: 'day',
-                        count: 1,
-                        text: '1d'
-                    }, {
-                        type: 'week',
-                        count: 1,
-                        text: '1w'
-                    }, {
-                        type: 'month',
-                        count: 1,
-                        text: '1m'
-                    }, {
-                        type: 'month',
-                        count: 3,
-                        text: '3m'
-                    }, {
-                        type: 'month',
-                        count: 6,
-                        text: '6m'
-                    }, {
-                        type: 'year',
-                        count: 1,
-                        text: '1y'
-                    }, {
-                        type: 'all',
-                        text: 'All'
-                    }],
-                    selected: 0
-                },
-                plotOptions: {
-                    area: {
-                        dataGrouping: {
-                            enabled: true,
-                            approximation: "low",
-                        },
                     },
-                },
-                series: [{
-                    data: cumulativePoints,
-                    type: 'area',
-                    step: true,
-                    name: 'Online'
-                }],
-                chart: {
-                    animation: false,
-                    renderTo: 'cumulative',
-                    zoomType: 'x',
-                },
-                title: {
-                    text: 'How many routers are online?',
-                },
-                xAxis: {
-                    ordinal: false,
-                },
-                yAxis: {
-                    title: 'Routers online',
-                    min: 0
-                },
+                    top: 350,
+                    height: 20 * (y - 1),
+                    offset: 0,
+                    lineWidth: 2,
+                }]
             });
         });
         </script>
