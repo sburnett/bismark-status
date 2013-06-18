@@ -102,6 +102,7 @@
                 cumulativePoints.push([parseInt(timestamps[i]), currentCount]);
             }
             series.push({
+                animation: false,
                 data: cumulativePoints,
                 type: 'area',
                 step: true,
