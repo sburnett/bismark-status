@@ -31,9 +31,35 @@
             var dictionary = data[0];
             var currentTime = parseInt(data[1]);
             var node_ids = [];
-            var filters = getParameterByName("node");
-            if (filters.length == 0) {
-                filters.push("");
+            var filters;
+            var subsets = getParameterByName("subset");
+            if (subsets.length > 0) {
+                var subset = subsets[0];
+                if (subset == "pk") {
+                    filters = new Array();
+                    filters.push("OW204E7F858E30");
+                    filters.push("OW204E7F858FB9");
+                    filters.push("OW204E7F917460");
+                    filters.push("OW2CB05DA0C21A");
+                    filters.push("OW2CB05DA0C27A");
+                    filters.push("OW2CB05DA0C2E9");
+                    filters.push("OW4C60DEE6AFF5");
+                    filters.push("OW4C60DEE6AFF8");
+                    filters.push("OW4C60DEE6B007");
+                    filters.push("OW4C60DEE6B0D9");
+                    filters.push("OW4C60DEE6B286");
+                    filters.push("OW4C60DEE6C6FF");
+                    filters.push("OW4C60DEE6C72F");
+                    filters.push("OW4C60DEE6C732");
+                    filters.push("OW4C60DEE6C741");
+                    filters.push("OW74440176472B");
+                    filters.push("OW744401765130");
+                }
+            } else {
+                filters = getParameterByName("node");
+                if (filters.length == 0) {
+                    filters.push("");
+                }
             }
             for (var i in filters) {
                 var filter = filters[i];
@@ -271,6 +297,12 @@
                 graph is generated every 10 minutes, so the dotted blue line
                 should never lag more than an hour behind the current time.</li>
             </ol>
+
+            Interesting subsets of nodes:
+
+            <ul>
+                <li><a href="?subset=pk">Pakistan deployment</a>
+            </ul>
 
             <div id="cumulative"></div>
 
