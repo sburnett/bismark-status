@@ -35,8 +35,8 @@
             var subsets = getParameterByName("subset");
             if (subsets.length > 0) {
                 var subset = subsets[0];
+                filters = new Array();
                 if (subset == "pk") {
-                    filters = new Array();
                     filters.push("OW204E7F858E30");
                     filters.push("OW204E7F858FB9");
                     filters.push("OW204E7F917460");
@@ -54,6 +54,25 @@
                     filters.push("OW4C60DEE6C741");
                     filters.push("OW74440176472B");
                     filters.push("OW744401765130");
+                } else if (subset == "za") {
+                    filters.push("OW2CB05D830287");
+                    filters.push("OW2CB05D830293");
+                    filters.push("OW2CB05D8302AB");
+                    filters.push("OW2CB05D83028A");
+                    filters.push("OW2CB05D8302A5");
+                    filters.push("OW2CB05D8302C0");
+                    filters.push("OW2CB05D830275");
+                    filters.push("OW2CB05D830284");
+                    filters.push("OW2CB05D830386");
+                    filters.push("OW2CB05D830296");
+                    filters.push("OW100D7F64CB55");
+                    filters.push("OW2CB05D873B72");
+                    filters.push("OW100D7F64C8A3");
+                    filters.push("OW100D7F64C8CD");
+                    filters.push("OW100D7F64CA02");
+                    filters.push("OWC43DC7B0D242");
+                    filters.push("OWC43DC7A376F1");
+                    filters.push("OWC43DC7B0AF3B");
                 }
             } else {
                 filters = getParameterByName("node");
@@ -302,6 +321,7 @@
 
             <ul>
                 <li><a href="?subset=pk">Pakistan deployment</a>
+                <li><a href="?subset=za">South African deployment</a>
             </ul>
 
             <div id="cumulative"></div>
