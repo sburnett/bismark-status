@@ -16,21 +16,33 @@
         // Source: http://stackoverflow.com/a/901144
         function getParameterByName(name) {
             name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
-            var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-                results = regex.exec(location.search);
-            return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+            var regex = new RegExp("[\\?&]" + name + "=([^&#]*)", 'g');
+            var filters = new Array();
+            var results;
+            while ((results = regex.exec(location.search)) !== null) {
+                for (var i = 1; i < results.length; i++) {
+                    filters.push(decodeURIComponent(results[i].replace(/\+/g, " ")));
+                }
+            }
+            return filters;
         }
 
         $.getJSON('status.json', function(data) {
             var dictionary = data[0];
             var currentTime = parseInt(data[1]);
             var node_ids = [];
-            var filter = getParameterByName("node");
-            for (var node_id in dictionary) {
-                if (!node_id.endsWith(filter)) {
-                    continue;
+            var filters = getParameterByName("node");
+            if (filters.length == 0) {
+                filters.push("");
+            }
+            for (var i in filters) {
+                var filter = filters[i];
+                for (var node_id in dictionary) {
+                    if (!node_id.endsWith(filter)) {
+                        continue;
+                    }
+                    node_ids.push(node_id);
                 }
-                node_ids.push(node_id);
             }
             node_ids.sort();
             node_ids.reverse();
@@ -43,6 +55,9 @@
             var y = 1;
             for (var i in node_ids) {
                 var node_id = node_ids[i];
+                if (i > 0 && node_ids[i - 1] == node_id) {
+                    continue;
+                }
                 var points = [];
                 var ends = [];
                 var availabilities = dictionary[node_id][0];
