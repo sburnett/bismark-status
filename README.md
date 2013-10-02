@@ -10,11 +10,11 @@ To use:
 https://github.com/sburnett/bismark-tools. For example, I run the following cron
 job every 10 minutes:
 
-    $HOME/go/src/github.com/sburnett/bismark-tools/scripts/availability-intervals \
-        --output_file=$HOME/public_html/bismark-status/status.json \
-        --cache_dir=/data/users/sburnett/bismark-availability-intervals-cache \
-        --outage_threshold=5m \
-        --output_leveldb=$HOME/bismark-availability-intervals.leveldb
+        $HOME/go/src/github.com/sburnett/bismark-tools/scripts/availability-intervals \
+            --output_file=$HOME/public_html/bismark-status/status.json \
+            --cache_dir=/data/users/sburnett/bismark-availability-intervals-cache \
+            --outage_threshold=5m \
+            --output_leveldb=$HOME/bismark-availability-intervals.leveldb
 
 (It will take longer to run the first time.) Make sure `status.json` is in the
 same directory as `index.html` from this repository.
