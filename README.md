@@ -15,8 +15,8 @@ job every 10 minutes:
             --cache_dir=/data/users/sburnett/bismark-availability-intervals-cache \
             --outage_threshold=5m \
             --output_leveldb=$HOME/bismark-availability-intervals.leveldb
-
-(It will take longer to run the first time.) Make sure `status.json` is in the
-same directory as `index.html` from this repository.
+            
+  (It will take longer to run the first time.) Make sure `status.json` is in the
+  same directory as `index.html` from this repository.
 
 2. Serve the `www` directory on the Web.
